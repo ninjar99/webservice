@@ -8,6 +8,8 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import dmdata.DataManager;
 import dmdata.xArrayList;
 
@@ -141,8 +143,57 @@ public class webserviceIml {
 						+"";
 					t = DBOperator.DoUpdate(sql);
 					if(t==0){
+						//扣除库存失败    订单状态更新为700
+						sql = "update oub_shipment_header set status='700',CHECK_BY_USER='"+userCode+"'"
+								+",CHECK_DTM_LOC=now(),UPDATED_BY_USER='"+userCode+"',UPDATED_DTM_LOC=now() "
+								+" where TRANSFER_ORDER_NO='"+trackingNo+"' ";
+						t = DBOperator.DoUpdate(sql);
 						return "ERR-运单号："+trackingNo+" 扣减库存失败";
 					}else{
+						sql = "select CONFIG_VALUE1,CONFIG_VALUE2 from sys_config_detail where CONFIG_CODE='IS_REDUCE_MATERIAL' and CONFIG_VALUE1='1' ";
+						dm = DBOperator.DoSelect2DM(sql);
+						if(dm==null || dm.getCurrentCount()==0){
+							//开关关闭，无须扣减包材库存数量
+						}else{
+							//扣减包材库存数量
+							sql = "update inv_inventory ii "
+									+ "inner join ( "
+									+ "select osd.STORER_CODE,osd.ITEM_CODE,osd.OQC_QTY,bim.ITEM_CODE_MATERIAL,bim.MATCH_QTY,(bim.MATCH_QTY*osd.OQC_QTY) MATERIAL_QTY "
+									+ "from oub_shipment_detail osd "
+									+ "left join bas_item_material bim on osd.STORER_CODE=bim.STORER_CODE and osd.ITEM_CODE=bim.ITEM_CODE "
+									+ "where osd.SHIPMENT_NO='"+shipmentNo+"') tmp on tmp.ITEM_CODE_MATERIAL=ii.ITEM_CODE "
+									+ "set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(tmp.MATERIAL_QTY),ii.OUB_TOTAL_QTY=ii.OUB_TOTAL_QTY+(tmp.MATERIAL_QTY) "
+									+ "";
+							t = DBOperator.DoUpdate(sql);
+							if(t==0){
+								//记录操作日志
+								DataManager dmProcess = comData.getSysProcessHistoryDataModel("sys_process_history");
+								if (dmProcess != null) {
+									dmdata.xArrayList list = (xArrayList) dmProcess.getRow(0);
+									list.set(dmProcess.getCol("SYS_PROCESS_HISTORY_ID"), "null");
+									list.set(dmProcess.getCol("PROCESS_CODE"), "OutboundCheck");
+									list.set(dmProcess.getCol("PROCESS_NAME"), "出库复核");
+									list.set(dmProcess.getCol("STORER_CODE"), "");
+									list.set(dmProcess.getCol("WAREHOUSE_CODE"),warehouseCode);
+									list.set(dmProcess.getCol("FROM_LOCATION_CODE"), "");
+									list.set(dmProcess.getCol("FROM_CONTAINER_CODE"), "");
+									list.set(dmProcess.getCol("QTY"), "");
+									list.set(dmProcess.getCol("REFERENCE_NO"), trackingNo);
+									list.set(dmProcess.getCol("REFERENCE_LINE_NO"), "");
+									list.set(dmProcess.getCol("REFERENCE_TYPE"), "");
+									list.set(dmProcess.getCol("LOT_NO"), "");
+									list.set(dmProcess.getCol("MESSAGE"), "扣除包材库存失败:"+StringEscapeUtils.escapeSql(sql));
+									list.set(dmProcess.getCol("PROCESS_TIME"), "now()");
+									list.set(dmProcess.getCol("CREATED_BY_USER"),userCode);
+									list.set(dmProcess.getCol("CREATED_DTM_LOC"), "now()");
+									list.set(dmProcess.getCol("UPDATED_DTM_LOC"), "now()");
+									dmProcess.RemoveRow(0);
+									dmProcess.AddNewRow(list);
+									boolean bool = comData.addSysProcessHistory("sys_process_history", dmProcess);
+									System.out.println("写入操作日志：" + bool);
+								}
+							}
+						}
 						//记录操作日志
 						DataManager dmProcess = comData.getSysProcessHistoryDataModel("sys_process_history");
 						if (dmProcess != null) {
@@ -1207,7 +1258,7 @@ public class webserviceIml {
 //
 //		System.out.println(new webserviceIml().getInventoryDetailByStorer("1117", "0094-00031"));
 //		System.out.println(new webserviceIml().getLogin("777", "888").equals(""));
-//		System.out.println(new webserviceIml().getShipmentOutboundCheck("1123320770606","HZ", "admin"));
+		System.out.println(new webserviceIml().getShipmentOutboundCheck("1123320770606","HZ", "admin"));
 //		System.out.println(new webserviceIml().checkStockTakeNo("ST00000007"));
 //		System.out.println(new webserviceIml().checkLocationCode("hz", "HZ-H16-B-2"));
 //		System.out.println(new webserviceIml().checkContainerNo("hz", "C000000198"));
