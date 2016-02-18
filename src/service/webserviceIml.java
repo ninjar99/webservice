@@ -1258,7 +1258,7 @@ public class webserviceIml {
 //
 //		System.out.println(new webserviceIml().getInventoryDetailByStorer("1117", "0094-00031"));
 //		System.out.println(new webserviceIml().getLogin("777", "888").equals(""));
-		System.out.println(new webserviceIml().getShipmentOutboundCheck("1123320770606","HZ", "admin"));
+//		System.out.println(new webserviceIml().getShipmentOutboundCheck("1123320770606","HZ", "admin"));
 //		System.out.println(new webserviceIml().checkStockTakeNo("ST00000007"));
 //		System.out.println(new webserviceIml().checkLocationCode("hz", "HZ-H16-B-2"));
 //		System.out.println(new webserviceIml().checkContainerNo("hz", "C000000198"));
@@ -1271,7 +1271,7 @@ public class webserviceIml {
 //		System.out.println(new webserviceIml().savePODetail("PO00000049","15.10.12","0001","hz","0094-00194","8","ƿ","lot1","","","","","","","","","lot10"));
 //		System.out.println(new webserviceIml().createReceiptHeader("PO00000053","sys"));
 //		System.out.println(new webserviceIml().createReceiptDetail("IN00000091","PO00000053","8806173556151","C000000010","100","sys"));
-//		System.out.println(new webserviceIml().generateInventoryByReceived("IN00000091","sys"));
+		System.out.println(new webserviceIml().generateInventoryByReceived("IN00000295","sys"));
 //		System.out.println(new webserviceIml().checkReceivedContainerCode("C000000001"));
 //		System.out.println(new webserviceIml().getSysSuggestLocation("C000000001"));
 //		System.out.println(new webserviceIml().checkPutawayDestLocationCode("HZ-H16-B-3"));
