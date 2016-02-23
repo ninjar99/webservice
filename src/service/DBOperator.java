@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 import dmdata.DataManager;
@@ -179,7 +180,9 @@ public class DBOperator {
 			return "";
 		if (obj != null) {
 			if (obj.getClass().getName().compareToIgnoreCase("java.sql.Timestamp") == 0) {
-				obj = Timestamp2Date((Timestamp) obj);
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				obj = sdf.format((Timestamp) obj);
+//				obj = Timestamp2Date((Timestamp) obj);
 			}
 		}
 		return obj;
