@@ -248,10 +248,10 @@ public class comData {
 		if(vec==null || vec.size()==0){
 			//插入新的库存行记录
 			sql = "insert into inv_inventory(WAREHOUSE_CODE,STORER_CODE,ITEM_CODE,ITEM_NAME,INV_LOT_ID,LOT_NO,LOCATION_CODE"
-					+ ",CONTAINER_CODE,ON_HAND_QTY,CREATED_BY_USER,CREATED_DTM_LOC) " 
+					+ ",CONTAINER_CODE,ON_HAND_QTY,INB_TOTAL_QTY,CREATED_BY_USER,CREATED_DTM_LOC) " 
 					+ "select '"+warehouseCode+"','"+storerCode+"','"+itemCode+"',(select ITEM_NAME from bas_item where storer_code='"+storerCode+"' and item_code='"+itemCode+"') "
 					+",(select INV_LOT_ID from inv_lot where LOT_NO='"+lotNo+"' and STORER_CODE='"+storerCode+"' and ITEM_CODE='"+itemCode+"'),"
-					+"'"+lotNo+"','"+locationCode+"','"+containerCode+"',"+onHandQty+",'"+userCode+"',now() ";
+					+"'"+lotNo+"','"+locationCode+"','"+containerCode+"',"+onHandQty+","+onHandQty+",'"+userCode+"',now() ";
 			int t = DBOperator.DoUpdate(sql);
 			if(t==1){
 				sql = "select INV_INVENTORY_ID from inv_inventory "
@@ -272,7 +272,8 @@ public class comData {
 			//增加库存数量
 			Object[] obj = (Object[]) vec.get(0);
 			INV_INVENTORY_ID = obj[0].toString();
-			sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY+("+onHandQty+") "
+			sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY+("+onHandQty+"),"
+					+ "INB_TOTAL_QTY=INB_TOTAL_QTY+("+onHandQty+") "
 					+"where INV_INVENTORY_ID="+INV_INVENTORY_ID;
 			int t = DBOperator.DoUpdate(sql);
 			if(t==1){

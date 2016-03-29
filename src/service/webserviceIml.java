@@ -137,7 +137,9 @@ public class webserviceIml {
 					sql = "update inv_inventory ii "
 						+"inner join oub_pick_detail opd on ii.INV_INVENTORY_ID=opd.INV_INVENTORY_ID "
 						+"inner join oub_shipment_header osh on osh.WAREHOUSE_CODE=opd.WAREHOUSE_CODE and osh.SHIPMENT_NO=opd.SHIPMENT_NO "
-						+" set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(opd.PICKED_QTY),ii.PICKED_QTY=ii.PICKED_QTY-(opd.PICKED_QTY),ii.OUB_TOTAL_QTY=ii.OUB_TOTAL_QTY+opd.PICKED_QTY "
+						+" set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(opd.PICKED_QTY),"
+						+ "ii.PICKED_QTY=ii.PICKED_QTY-(opd.PICKED_QTY),"
+						+ "ii.OUB_TOTAL_QTY=ii.OUB_TOTAL_QTY+opd.PICKED_QTY "
 						+",ii.UPDATED_DTM_LOC=now(),ii.UPDATED_BY_USER='"+userCode+"'"
 						+"where osh.TRANSFER_ORDER_NO='"+trackingNo+"' and osh.WAREHOUSE_CODE='"+warehouseCode+"' "
 						+"";
@@ -162,7 +164,8 @@ public class webserviceIml {
 									+ "from oub_shipment_detail osd "
 									+ "left join bas_item_material bim on osd.STORER_CODE=bim.STORER_CODE and osd.ITEM_CODE=bim.ITEM_CODE "
 									+ "where osd.SHIPMENT_NO='"+shipmentNo+"') tmp on tmp.ITEM_CODE_MATERIAL=ii.ITEM_CODE "
-									+ "set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(tmp.MATERIAL_QTY),ii.OUB_TOTAL_QTY=ii.OUB_TOTAL_QTY+(tmp.MATERIAL_QTY) "
+									+ "set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(tmp.MATERIAL_QTY),"
+									+ "ii.OUB_TOTAL_QTY=ii.OUB_TOTAL_QTY+(tmp.MATERIAL_QTY) "
 									+ "";
 							t = DBOperator.DoUpdate(sql);
 							if(t==0){
@@ -1168,9 +1171,9 @@ public class webserviceIml {
 			//不存在就插入目标库位新记录   冻结数量
 			if(dm2==null || dm2.getCurrentCount()==0){
 				sql = "insert into inv_inventory(WAREHOUSE_CODE,STORER_CODE,ITEM_CODE,ITEM_NAME,INV_LOT_ID,LOT_NO,LOCATION_CODE"
-						+ ",CONTAINER_CODE,INACTIVE_QTY,CREATED_BY_USER,CREATED_DTM_LOC) "
+						+ ",CONTAINER_CODE,INACTIVE_QTY,INB_TOTAL_QTY,CREATED_BY_USER,CREATED_DTM_LOC) "
 						+"select WAREHOUSE_CODE,STORER_CODE,ITEM_CODE,ITEM_NAME,INV_LOT_ID,LOT_NO,'"+DEST_LOCATION_CODE+"',"
-						+"'"+DEST_CONTAINER_CODE+"',"+QTY+",'"+userCode+"',now() "
+						+"'"+DEST_CONTAINER_CODE+"',"+QTY+","+QTY+",'"+userCode+"',now() "
 						+" from inv_inventory where warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + FROM_LOCATION_CODE + "' and container_code='" + FROM_CONTAINER_CODE
 						+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 				int insertCount = DBOperator.DoUpdate(sql);
@@ -1178,7 +1181,8 @@ public class webserviceIml {
 					return "ERR-数据插入目标库位失败";
 				}else{
 					//存在就扣减原库位数量
-					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+") "
+					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+"),"
+							+ "OUB_TOTAL_QTY=OUB_TOTAL_QTY+("+QTY+") "
 							+ "where INV_INVENTORY_ID='"+fromInvID+"' and warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + FROM_LOCATION_CODE + "' and container_code='" + FROM_CONTAINER_CODE
 							+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 					//执行扣原库位库存
@@ -1214,7 +1218,8 @@ public class webserviceIml {
 			}else{
 				//存在 更新目标库位库存数量    冻结数量
 				String toInvID = dm2.getString("INV_INVENTORY_ID", 0);
-				sql = "update inv_inventory set INACTIVE_QTY=INACTIVE_QTY+("+QTY+") "
+				sql = "update inv_inventory set INACTIVE_QTY=INACTIVE_QTY+("+QTY+"),"
+						+ "INB_TOTAL_QTY=INB_TOTAL_QTY+("+QTY+") "
 						+ "where INV_INVENTORY_ID='"+toInvID+"' and warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + DEST_LOCATION_CODE + "' and container_code='" + DEST_CONTAINER_CODE
 						+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 				int insertCount = DBOperator.DoUpdate(sql);
@@ -1222,7 +1227,8 @@ public class webserviceIml {
 					return "ERR-数据更新到目标库位失败";
 				}else{
 					//存在就扣减原库位数量
-					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+") "
+					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+"),"
+							+ "OUB_TOTAL_QTY=OUB_TOTAL_QTY+("+QTY+") "
 							+ "where INV_INVENTORY_ID='"+fromInvID+"' and warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + FROM_LOCATION_CODE + "' and container_code='" + FROM_CONTAINER_CODE
 							+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 					//执行扣原库位库存
@@ -1268,9 +1274,9 @@ public class webserviceIml {
 			//不存在就插入目标库位新记录
 			if(dm2==null || dm2.getCurrentCount()==0){
 				sql = "insert into inv_inventory(WAREHOUSE_CODE,STORER_CODE,ITEM_CODE,ITEM_NAME,INV_LOT_ID,LOT_NO,LOCATION_CODE"
-						+ ",CONTAINER_CODE,ON_HAND_QTY,CREATED_BY_USER,CREATED_DTM_LOC) "
+						+ ",CONTAINER_CODE,ON_HAND_QTY,INB_TOTAL_QTY,CREATED_BY_USER,CREATED_DTM_LOC) "
 						+"select WAREHOUSE_CODE,STORER_CODE,ITEM_CODE,ITEM_NAME,INV_LOT_ID,LOT_NO,'"+DEST_LOCATION_CODE+"',"
-						+"'"+DEST_CONTAINER_CODE+"',"+QTY+",'"+userCode+"',now() "
+						+"'"+DEST_CONTAINER_CODE+"',"+QTY+","+QTY+",'"+userCode+"',now() "
 						+" from inv_inventory where warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + FROM_LOCATION_CODE + "' and container_code='" + FROM_CONTAINER_CODE
 						+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 				int insertCount = DBOperator.DoUpdate(sql);
@@ -1278,7 +1284,8 @@ public class webserviceIml {
 					return "ERR-数据写入目标库位失败";
 				}else{
 					//存在就扣减原库位数量
-					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+") "
+					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+"),"
+							+ "OUB_TOTAL_QTY=OUB_TOTAL_QTY+("+QTY+") "
 							+ "where INV_INVENTORY_ID='"+fromInvID+"' and warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + FROM_LOCATION_CODE + "' and container_code='" + FROM_CONTAINER_CODE
 							+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 					//执行扣原库位库存
@@ -1314,7 +1321,8 @@ public class webserviceIml {
 			}else{
 				//存在 更新目标库位库存数量
 				String toInvID = dm2.getString("INV_INVENTORY_ID", 0);
-				sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY+("+QTY+") "
+				sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY+("+QTY+"),"
+						+ "INB_TOTAL_QTY=INB_TOTAL_QTY+("+QTY+") "
 						+ "where INV_INVENTORY_ID='"+toInvID+"' and warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + DEST_LOCATION_CODE + "' and container_code='" + DEST_CONTAINER_CODE
 						+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 				int insertCount = DBOperator.DoUpdate(sql);
@@ -1322,7 +1330,8 @@ public class webserviceIml {
 					return "ERR-数据更新到目标库位失败";
 				}else{
 					//存在就扣减原库位数量
-					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+") "
+					sql = "update inv_inventory set ON_HAND_QTY=ON_HAND_QTY-("+QTY+"),"
+							+ "OUB_TOTAL_QTY=OUB_TOTAL_QTY+("+QTY+") "
 							+ "where INV_INVENTORY_ID='"+fromInvID+"' and warehouse_code='"+WAREHOUSE_CODE+"' and location_code='" + FROM_LOCATION_CODE + "' and container_code='" + FROM_CONTAINER_CODE
 							+ "' and item_code='" + itemCodeFrom.toString().trim() + "' and LOT_NO = '"+lotNo+"' ";
 					//执行扣原库位库存
