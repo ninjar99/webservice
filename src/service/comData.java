@@ -201,6 +201,14 @@ public class comData {
 				inventoryID = getInventoryID(warehouseCode,storerCode,itemCode,lotNo,locationCode,containCode,receivedQty,userCode);
 				if(!inventoryID.equals("")){
 					//库存表写入成功
+					
+					//插入AOS库存表（opt_core.opt_product_batch_info）
+					sql = "insert into opt_core.opt_product_batch_info(batch,sku,supplier_id,"
+						+ "total_sum,create_date,fst_space,sec_space,has_push_customs) "
+						+ "select '"+lotNo+"','"+itemCode+"','"+storerCode+"',"
+						+receivedQty+",now(),'"+lottable10+"','"+warehouseCode+"',0";
+					int t = DBOperator.DoUpdate(sql);
+					
 					continue;
 				}else{
 					return false;
