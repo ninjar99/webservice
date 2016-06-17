@@ -4,7 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import dmdata.DataManager;
@@ -341,6 +344,29 @@ public class comData {
 		}else{
 			return false;
 		}
+	}
+	
+	public static String createLinkString(Map<String, String> params) {
+		List<String> keys = new ArrayList<String>(params.keySet());
+		Collections.sort(keys);
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < keys.size(); i++) {
+			sb.append(keys.get(i)).append("=").append(params.get(keys.get(i))).append("&");
+		}
+		return sb.toString();
+	}
+	
+	public static String createLinkString2(Map<String, String> params) {
+		List<String> keys = new ArrayList<String>(params.keySet());
+		Collections.sort(keys);
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < keys.size(); i++) {
+			sb.append(keys.get(i)).append("=").append(params.get(keys.get(i)));
+			if(i!=keys.size()-1){
+				sb.append("&");
+			}
+		}
+		return sb.toString();
 	}
 	
 	public static void main(String[] args){

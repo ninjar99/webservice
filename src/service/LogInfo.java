@@ -67,6 +67,12 @@ public class LogInfo {
                 log.createNewFile();
             }
             fileAppend(log.getAbsolutePath(),newLog+" ["+getCurrentDate()+"]\r\n\r\n");
+            if(logFileName.equalsIgnoreCase("error")){
+            	String sql = "insert into sys_error_log(USER_CODE,WAREHOUSE_CODE,ERRMESSAGE,DATETIME) "
+            			+ "select 'wms_webservice','',"
+            			+ "'"+newLog+"',now() ";
+            	DBOperator.DoUpdate(sql);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }

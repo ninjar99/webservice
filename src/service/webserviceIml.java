@@ -12,6 +12,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import dmdata.DataManager;
 import dmdata.xArrayList;
+import net.sf.json.JSONObject;
+import util.HttpMethod;
 
 //在想要发布成WebService的类上加上注解@WebService   
 @WebService
@@ -152,6 +154,17 @@ public class webserviceIml {
 						t = DBOperator.DoUpdate(sql);
 						return "ERR-运单号："+trackingNo+" 扣减库存失败";
 					}else{
+						//接口推送海关扣减    海关账册库存
+						sql = "select a.TRANSFER_ORDER_NO,b.ITEM_CODE sourceNo,b.OQC_QTY inOutAmount "
+								+ "from oub_shipment_header a "
+								+ "inner join oub_shipment_detail b on a.shipment_no=b.shipment_no and a.warehouse_code=b.warehouse_code "
+								+ "where a.shipment_no='"+shipmentNo+"' "
+								+ "and a.WAREHOUSE_CODE='"+warehouseCode+"' ";
+						dm = DBOperator.DoSelect2DM(sql);
+						String jsonData = DBOperator.DataManager2JSONString(dm, "productDeatil");
+						JSONObject dataJson = JSONObject.fromObject(jsonData);
+						new HttpMethod().httpPost_manInOutStock(dm.getString("TRANSFER_ORDER_NO", 0), dataJson.get("productDeatil").toString());
+						
 						sql = "select CONFIG_VALUE1,CONFIG_VALUE2 from sys_config_detail where CONFIG_CODE='IS_REDUCE_MATERIAL' and CONFIG_VALUE1='1' ";
 						dm = DBOperator.DoSelect2DM(sql);
 						if(dm==null || dm.getCurrentCount()==0){

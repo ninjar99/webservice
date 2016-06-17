@@ -25,5 +25,7 @@
 	<classpathentry kind="var" path="TOMCAT_HOME/lib/jsp-api.jar"/>
 	<classpathentry kind="var" path="TOMCAT_HOME/lib/el-api.jar"/>
 	<classpathentry kind="var" path="TOMCAT_HOME/lib/annotations-api.jar"/>
+	<classpathentry kind="lib" path="D:/work/aggwebservice/workspace/WSAPP/WEB-INF/lib/httpclient-4.2.jar"/>
+	<classpathentry kind="lib" path="D:/work/aggwebservice/workspace/WSAPP/WEB-INF/lib/httpcore-4.2.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>
