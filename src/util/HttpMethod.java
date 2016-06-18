@@ -13,14 +13,14 @@ import service.comData;
 public class HttpMethod {
 	
 	public static void main(String[] args){
-//		String sql = "select a.TRANSFER_ORDER_NO,b.ITEM_CODE sourceNo,b.OQC_QTY inOutAmount "
-//				+ "from oub_shipment_header a "
-//				+ "inner join oub_shipment_detail b on a.shipment_no=b.shipment_no and a.warehouse_code=b.warehouse_code "
-//				+ "where a.shipment_no='SO00000024'";
-//		DataManager dm = DBOperator.DoSelect2DM(sql);
-//		String jsonData = DBOperator.DataManager2JSONString(dm, "productDeatil");
-//		JSONObject dataJson = JSONObject.fromObject(jsonData);
-//		new HttpMethod().httpPost_manInOutStock(dm.getString("TRANSFER_ORDER_NO", 0), dataJson.get("productDeatil").toString());
+		String sql = "select a.TRANSFER_ORDER_NO,b.ITEM_CODE sourceNo,b.OQC_QTY inOutAmount "
+				+ "from oub_shipment_header a "
+				+ "inner join oub_shipment_detail b on a.shipment_no=b.shipment_no and a.warehouse_code=b.warehouse_code "
+				+ "where a.shipment_no='SO00000019'";
+		DataManager dm = DBOperator.DoSelect2DM(sql);
+		String jsonData = DBOperator.DataManager2JSONString(dm, "productDeatil");
+		JSONObject dataJson = JSONObject.fromObject(jsonData);
+		new HttpMethod().httpPost_manInOutStock(dm.getString("TRANSFER_ORDER_NO", 0), dataJson.get("productDeatil").toString());
 	}
 	
 	public String httpPost_manInOutStock(String wayBill,String productDeatil){

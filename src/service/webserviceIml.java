@@ -96,7 +96,7 @@ public class webserviceIml {
 				status = dm.getString("status", 0);
 				shipmentNo = dm.getString("SHIPMENT_NO", 0);
 				checkUser = dm.getString("CHECK_BY_USER", 0);
-				checkTime = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dm.getDate("CHECK_DTM_LOC", 0));
+				checkTime = dm.getString("CHECK_DTM_LOC", 0);
 				if(status.equals("800")){
 					if(checkUser.equals(userCode)){
 						outputString = "ERR=运单已经出库复核完成";
