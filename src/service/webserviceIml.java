@@ -168,12 +168,18 @@ public class webserviceIml {
 							dm = DBOperator.DoSelect2DM(sql);
 							String jsonData = DBOperator.DataManager2JSONString(dm, "productDeatil");
 							JSONObject dataJson = JSONObject.fromObject(jsonData);
+							try{
 							String postResult =  new HttpMethod().httpPost_manInOutStock(dm.getString("TRANSFER_ORDER_NO", 0), dataJson.get("productDeatil").toString());
 							dataJson = JSONObject.fromObject(postResult);
 							if(dataJson.get("code").equals("0")){
 								sql = "update oub_shipment_header set IS_PUSH_CUSTOM='Y' "
 									+ "where shipment_no='"+shipmentNo+"' and WAREHOUSE_CODE='"+warehouseCode+"' ";
 								t = DBOperator.DoUpdate(sql);
+							}else{
+								LogInfo.appendLog("error","ø€ºı∫£πÿ’À≤·ø‚¥Ê ß∞‹\n"+postResult+"\n"+jsonData);
+							}
+							}catch(Exception e){
+								LogInfo.appendLog("error","ø€ºı∫£πÿ’À≤·ø‚¥Ê ß∞‹"+"\n"+jsonData);
 							}
 						}
 						
