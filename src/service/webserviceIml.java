@@ -88,14 +88,17 @@ public class webserviceIml {
 		String checkTime = "";
 		String outputString = "";
 		if(!trackingNo.equals("")){
-			sql = "select SHIPMENT_NO,status,CHECK_BY_USER,CHECK_DTM_LOC from oub_shipment_header where TRANSFER_ORDER_NO='"+trackingNo+"' and WAREHOUSE_CODE='"+warehouseCode+"' ";
+			sql = "select osh.SHIPMENT_NO,osh.status,osh.CHECK_BY_USER,user.USER_NAME,osh.CHECK_DTM_LOC "
+				+ "from oub_shipment_header osh "
+				+ "left join sys_user user on osh.CHECK_BY_USER=user.USER_CODE and user.WAREHOUSE_CODE=osh.WAREHOUSE_CODE "
+				+ "where osh.TRANSFER_ORDER_NO='"+trackingNo+"' and osh.WAREHOUSE_CODE='"+warehouseCode+"' ";
 			DataManager dm = DBOperator.DoSelect2DM(sql);
 			if(dm==null || dm.getCurrentCount()==0){
 				outputString ="ERR=运单号不正确，请重新输入！";
 			}else{
 				status = dm.getString("status", 0);
 				shipmentNo = dm.getString("SHIPMENT_NO", 0);
-				checkUser = dm.getString("CHECK_BY_USER", 0);
+				checkUser = dm.getString("USER_NAME", 0);
 				checkTime = dm.getString("CHECK_DTM_LOC", 0);
 				if(status.equals("800")){
 					if(checkUser.equals(userCode)){
