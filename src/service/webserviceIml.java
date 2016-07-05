@@ -88,7 +88,7 @@ public class webserviceIml {
 		String checkTime = "";
 		String outputString = "";
 		if(!trackingNo.equals("")){
-			sql = "select osh.SHIPMENT_NO,osh.status,osh.CHECK_BY_USER,user.USER_NAME,osh.CHECK_DTM_LOC "
+			sql = "select osh.SHIPMENT_NO,osh.status,osh.CHECK_BY_USER,concat(osh.CHECK_BY_USER,' ',ifnull(user.USER_NAME,'')) USER_NAME,osh.CHECK_DTM_LOC "
 				+ "from oub_shipment_header osh "
 				+ "left join sys_user user on osh.CHECK_BY_USER=user.USER_CODE and user.WAREHOUSE_CODE=osh.WAREHOUSE_CODE "
 				+ "where osh.TRANSFER_ORDER_NO='"+trackingNo+"' and osh.WAREHOUSE_CODE='"+warehouseCode+"' ";
