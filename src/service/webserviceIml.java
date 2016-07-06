@@ -167,7 +167,7 @@ public class webserviceIml {
 						dm = DBOperator.DoSelect2DM(sql);
 						//∑¿÷π÷ÿ∏¥Õ∆ÀÕ∫£πÿø€ºı’À≤·ø‚¥Ê
 						if(dm.getString("IS_PUSH_CUSTOM", 0).equalsIgnoreCase("N")){
-							sql = "select a.EXTERNAL_ORDER_NO order_sn,a.TRANSFER_ORDER_NO,b.ITEM_CODE sourceNo,b.OQC_QTY inOutAmount "
+							sql = "select a.EXTERNAL_ORDER_NO orderSn,a.TRANSFER_ORDER_NO,b.ITEM_CODE sourceNo,b.OQC_QTY inOutAmount "
 									+ "from oub_shipment_header a "
 									+ "inner join oub_shipment_detail b on a.shipment_no=b.shipment_no and a.warehouse_code=b.warehouse_code "
 									+ "where a.shipment_no='"+shipmentNo+"' "
