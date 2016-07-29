@@ -358,7 +358,7 @@ public class webserviceIml {
 		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
-				+"inner join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
 				+"where bi.STORER_CODE='"+STORER_CODE+"' and bi.ITEM_BAR_CODE='"+ITEM_BAR_CODE+"' limit 1 ";
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
@@ -380,7 +380,7 @@ public class webserviceIml {
 		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
-				+"inner join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
 				+"where bi.ITEM_BAR_CODE='"+ITEM_BAR_CODE+"' limit 1 ";
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
@@ -645,7 +645,7 @@ public class webserviceIml {
 		String sql = "select ii.item_code,bi.item_bar_code,bi.item_name,sum(ON_HAND_QTY-ALLOCATED_QTY-PICKED_QTY) open_qty,biu.unit_name "
 				+ "from inv_inventory ii "
 				+ "inner join bas_item bi on ii.storer_code=bi.storer_code and ii.item_code=bi.item_code "
-				+ "inner join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+				+ "left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
 				+ "left outer join inv_lot il on ii.LOT_NO=il.LOT_NO " 
 				+ "where ii.STORER_CODE='" + storercode + "' and ii.item_code='"+itemcode+"' "
 				+ "group by ii.item_code,bi.item_bar_code,bi.item_name ";
@@ -847,7 +847,7 @@ public class webserviceIml {
 				+" from inb_po_header iph "
 				+"inner join inb_po_detail ipd on iph.PO_NO=ipd.PO_NO and iph.INB_PO_HEADER_ID=ipd.INB_PO_HEADER_ID "
 				+"inner join bas_item bi on ipd.ITEM_CODE=bi.ITEM_CODE "
-				+"inner join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
 				+"where ipd.PO_NO='"+poNo+"' and bi.ITEM_BAR_CODE='"+itemBarCode+"' "
 				+" and ifnull(ipd.TOTAL_QTY,0)-ifnull(ipd.RECEIVED_QTY,0)>0 "
 				+"order by ifnull(ipd.TOTAL_QTY,0)-ifnull(ipd.RECEIVED_QTY,0) "
@@ -877,7 +877,7 @@ public class webserviceIml {
 						+"from inb_po_header iph "
 						+"inner join inb_po_detail ipd on iph.PO_NO=ipd.PO_NO and iph.INB_PO_HEADER_ID=ipd.INB_PO_HEADER_ID "
 						+"inner join bas_item bi on ipd.ITEM_CODE=bi.ITEM_CODE "
-						+"inner join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+						+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
 						+"where ipd.PO_NO='"+poNo+"' and bi.ITEM_BAR_CODE='"+itemBarCode+"' "
 						+" and ifnull(ipd.TOTAL_QTY,0)-ifnull(ipd.RECEIVED_QTY,0)>0 "
 						+"order by ifnull(ipd.TOTAL_QTY,0)-ifnull(ipd.RECEIVED_QTY,0) "
@@ -1148,7 +1148,7 @@ public class webserviceIml {
 		String sql = "select ii.LOCATION_CODE,bi.ITEM_BAR_CODE,bi.ITEM_NAME,sum(ii.ON_HAND_QTY+ii.IN_TRANSIT_QTY-(ii.PICKED_QTY)-(ii.ALLOCATED_QTY)) QTY,biu.unit_name "
 				+"from inv_inventory ii "
 				+"inner join bas_item bi on ii.STORER_CODE=bi.STORER_CODE and ii.ITEM_CODE=bi.ITEM_CODE "
-				+"inner join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
 				+"where ii.LOCATION_CODE like '%"+LOCATION_CODE+"%' and bi.ITEM_BAR_CODE like '%"+ITEM_BAR_CODE+"%' "
 				+"GROUP BY ii.LOCATION_CODE,bi.ITEM_BAR_CODE,bi.ITEM_NAME ";
 		if (sqlValidate(sql)) {
