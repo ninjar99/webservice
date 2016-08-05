@@ -91,7 +91,13 @@ public class DBConnectionManager {
 			if (pool != null) {
 				LogInfo.appendLog("connect counter:"+clients);
 				System.out.println("connect counter:"+clients);
-				return pool.getConnection();
+				java.sql.Connection con = pool.getConnection();
+				if(con==null){
+					init();
+					con = pool.getConnection();
+				}else{
+					return pool.getConnection();
+				}
 			} else {
 				init();
 				pool = (DBConnectionPool) pools.get(name);
