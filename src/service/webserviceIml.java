@@ -536,13 +536,19 @@ public class webserviceIml {
 		storerCode = dm.getString("STORER_CODE", 0);
 		warehouseCode = dm.getString("WAREHOUSE_CODE", 0);
 		
-		sql = "select item_code,unit_code,item_name from bas_item where item_bar_code='"+itemBarCode+"'";
+		sql = "select item_code,unit_code,item_name from bas_item "
+			+ "where STORER_CODE='"+storerCode+"' and item_bar_code='"+itemBarCode+"'";
 		if (!itemBarCode.equals("")) {
 			dm = DBOperator.DoSelect2DM(sql);
 			if (dm == null || dm.getCurrentCount() == 0) {
-				itemCode = itemBarCode;
-				unitCode = "007";
-				itemName = itemBarCode;
+				sql = "select item_code,unit_code,item_name from bas_item "
+						+ "where item_bar_code='"+itemBarCode+"'";
+				dm = DBOperator.DoSelect2DM(sql);
+				if (dm == null || dm.getCurrentCount() == 0) {
+					itemCode = itemBarCode;
+					unitCode = "007";
+					itemName = itemBarCode;
+				}
 			}else{
 				itemCode = dm.getString("item_code", 0);
 				unitCode = dm.getString("unit_code", 0);
