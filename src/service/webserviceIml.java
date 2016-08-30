@@ -1046,38 +1046,42 @@ public class webserviceIml {
 	public String putawayConfirm(@WebParam(name = "LOCATION_CODE", partName = "LOCATION_CODE") String LOCATION_CODE,
 			@WebParam(name = "CONTAINER_CODE", partName = "CONTAINER_CODE") String CONTAINER_CODE,
 			@WebParam(name = "userCode", partName = "userCode") String userCode) {
-		String sql = "select container_code from inv_inventory where container_code='"+CONTAINER_CODE+"' ";
+		String sql = "select WAREHOUSE_CODE,container_code from inv_inventory where container_code='"+CONTAINER_CODE+"' ";
 		DataManager tmpDM = DBOperator.DoSelect2DM(sql);
 		if(tmpDM==null || tmpDM.getCurrentCount()==0){
 			return "ERR-箱号未收货，不能上架";
 		}
-		if(tmpDM.getCurrentCount()>1){
-			return "ERR-该箱号之前有收货完成未上架的任务，不能重复使用该箱号上架";
-		}
-		sql = "update inv_inventory set location_code='"+LOCATION_CODE+"' where container_code='"+CONTAINER_CODE+"' ";
+//		if(tmpDM.getCurrentCount()>1){
+//			return "ERR-该箱号之前有收货完成未上架的任务，不能重复使用该箱号上架";
+//		}
+		String WAREHOUSE_CODE = tmpDM.getString("WAREHOUSE_CODE", 0);
+		sql = "update inv_inventory set location_code='"+LOCATION_CODE+"' "
+			+ "where WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' container_code='"+CONTAINER_CODE+"' ";
 		int t = DBOperator.DoUpdate(sql);
 		if(t==0){
 			return "ERR-上架失败，未找到数据,库位："+LOCATION_CODE+"，箱号："+CONTAINER_CODE+"，请联系系统管理员";
 		}else{
 			//如果周装箱 use_type=temp (临时)，上架后更新库存Container_code = '*'，同时收货周装箱  status='0'
-			sql = "select ii.WAREHOUSE_CODE,ii.STORER_CODE,ii.ITEM_CODE,ii.LOT_NO,ii.LOCATION_CODE,bc.USE_TYPE,ii.CONTAINER_CODE,ii.ON_HAND_QTY "
+			sql = "select ii.INV_INVENTORY_ID,ii.WAREHOUSE_CODE,ii.STORER_CODE,ii.ITEM_CODE,ii.LOT_NO,ii.LOCATION_CODE,bc.USE_TYPE,ii.CONTAINER_CODE,ii.ON_HAND_QTY "
 					+"from inv_inventory ii inner join bas_container bc on ii.WAREHOUSE_CODE=bc.WAREHOUSE_CODE and ii.CONTAINER_CODE=bc.CONTAINER_CODE "
-					+"where ii.LOCATION_CODE='"+LOCATION_CODE+"' and ii.CONTAINER_CODE='"+CONTAINER_CODE+"' ";
+					+"where ii.WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' and ii.LOCATION_CODE='"+LOCATION_CODE+"' and ii.CONTAINER_CODE='"+CONTAINER_CODE+"' ";
 			DataManager dm = DBOperator.DoSelect2DM(sql);
 			if(dm==null || dm.getCurrentCount()==0){
 				return "ERR-上架失败，更新到上架库位失败，请联系系统管理员";
 			}
-			if(dm.getCurrentCount()==1){
-				String USE_TYPE = dm.getString("USE_TYPE", 0);
-				String WAREHOUSE_CODE = dm.getString("WAREHOUSE_CODE", 0);
-				String STORER_CODE = dm.getString("STORER_CODE", 0);
-				String ITEM_CODE = dm.getString("ITEM_CODE", 0);
-				String LOT_NO = dm.getString("LOT_NO", 0);
-				String ON_HAND_QTY = dm.getString("ON_HAND_QTY", 0);
+			for(int i=0;i<dm.getCurrentCount();i++){
+				WAREHOUSE_CODE = dm.getString("WAREHOUSE_CODE", i);
+				String INV_INVENTORY_ID = dm.getString("INV_INVENTORY_ID", i);
+				String USE_TYPE = dm.getString("USE_TYPE", i);
+				String STORER_CODE = dm.getString("STORER_CODE", i);
+				String ITEM_CODE = dm.getString("ITEM_CODE", i);
+				String LOT_NO = dm.getString("LOT_NO", i);
+				String ON_HAND_QTY = dm.getString("ON_HAND_QTY", i);
 				
-				//先判断当前库存的container_code=* 是否有库存，如果有，就数量累加，否则就直接更新库存的container_code=*
 				String tmp = "";
+				//判断周转箱是否是临时周转箱，如果是需要增加库存，否则直接把周转箱带入库存表
 				if(USE_TYPE.equalsIgnoreCase("temp")){
+					//先判断当前库存的container_code=* 是否有库存，如果有，就数量累加，否则就直接更新库存的container_code=*
 					tmp = comData.getInventoryID(WAREHOUSE_CODE,STORER_CODE,ITEM_CODE,LOT_NO,LOCATION_CODE,"*",ON_HAND_QTY,userCode);
 					if(!tmp.equals("")){
 						//释放箱号状态
@@ -1085,7 +1089,8 @@ public class webserviceIml {
 						t = DBOperator.DoUpdate(sql);
 						if(t>0){
 							//上架成功，原先库存行记录(container_code <> *)
-							sql = "delete from inv_inventory where LOCATION_CODE='"+LOCATION_CODE+"' and CONTAINER_CODE='"+CONTAINER_CODE+"' ";
+							sql = "delete from inv_inventory "
+								+ "where INV_INVENTORY_ID='"+INV_INVENTORY_ID+"' and LOCATION_CODE='"+LOCATION_CODE+"' and CONTAINER_CODE='"+CONTAINER_CODE+"' ";
 							t = DBOperator.DoUpdate(sql);
 							//更改库位为已使用状态
 							sql = "update bas_location set STATUS='storage',UPDATED_BY_USER='"+userCode+"',UPDATED_DTM_LOC=now(),USER_DEF1='入库上架' "
@@ -1135,11 +1140,13 @@ public class webserviceIml {
 					}
 				}
 				
-			}else{
-				return "ERR-上架失败\n当前库位："+LOCATION_CODE+"，箱号："+CONTAINER_CODE+" \n之前有未完成的上架任务，请联系系统管理员";
 			}
+//			else{
+//				return "ERR-上架失败\n当前库位："+LOCATION_CODE+"，箱号："+CONTAINER_CODE+" \n之前有未完成的上架任务，请联系系统管理员";
+//			}
 
 		}
+		return "OK-上架成功";
 	}
 	
 	/**
