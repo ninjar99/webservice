@@ -404,6 +404,8 @@ public class webserviceIml {
 			@WebParam(name = "itemQty", partName = "itemQty") String itemQty,
 			@WebParam(name = "userCode", partName = "userCode") String userCode) {
 		String itemCode = "";
+		String unitCode = "";
+		String itemName = "";
 		String itemBarCode = ITEM_BAR_CODE;
 		String storerCode = "";
 		String warehouseCode = "";
@@ -415,15 +417,31 @@ public class webserviceIml {
 		storerCode = dm.getString("STORER_CODE", 0);
 		warehouseCode = dm.getString("WAREHOUSE_CODE", 0);
 		
-		sql = "select item_code,unit_code,item_name from bas_item where storer_code='"+storerCode+"' and item_bar_code='"+itemBarCode+"'";
+		sql = "select item_code,unit_code,item_name from bas_item "
+			+ "where storer_code='"+storerCode+"' and item_bar_code='"+itemBarCode+"'";
 		if (!itemBarCode.equals("")) {
 			dm = DBOperator.DoSelect2DM(sql);
 			if (dm == null || dm.getCurrentCount() == 0) {
 				return "ERR-商品条码输入不正确!";
 			}else{
+				//判断一个条码对应多个物料号，那么还需要根据仓库编码+货主+条码 来进行选择 正确的物料号
+				if(dm.getCurrentCount()>1){
+					sql = "select item_code,unit_code,item_name from bas_item "
+						+ "where storer_code='"+storerCode+"' "
+						+ "and item_bar_code='"+itemBarCode+"' "
+						+ "and item_code in (select distinct inv.item_code from inv_inventory inv where inv.storer_code='"+storerCode+"' and inv.item_code=item_code and inv.warehouse_code='"+warehouseCode+"')";
+						dm = DBOperator.DoSelect2DM(sql);
+						if(dm.getCurrentCount()==0){
+							return "ERR-商品条码与选择仓库不匹配!";
+						}else{
+							itemCode = dm.getString("item_code", 0);
+							unitCode = dm.getString("unit_code", 0);
+							itemName = dm.getString("item_name", 0);
+						}
+				}
 				itemCode = dm.getString("item_code", 0);
-				String unitCode = dm.getString("unit_code", 0);
-				String itemName = dm.getString("item_name", 0);
+				unitCode = dm.getString("unit_code", 0);
+				itemName = dm.getString("item_name", 0);
 				sql = "select STOCKTAKE_NO,STORER_CODE,WAREHOUSE_CODE,LOCATION_CODE,CONTAINER_CODE,ITEM_CODE "
 						+"from inv_stocktake_detail isd "
 						+" where isd.STOCKTAKE_NO='"+stockTakeNo+"' and isd.STORER_CODE='"+storerCode+"' "
