@@ -140,11 +140,11 @@ public class webserviceIml {
 					}
 					//更新库存分配数量和拣货数量
 					sql = "update inv_inventory ii "
-						+"inner join (select t.STORER_CODE,t.WAREHOUSE_CODE,t.SHIPMENT_NO,t.SHIPMENT_LINE_NO,t.ITEM_CODE,t.INV_INVENTORY_ID,sum(t.PICKED_QTY) PICKED_QTY "
+						+"inner join (select t.STORER_CODE,t.WAREHOUSE_CODE,t.SHIPMENT_NO,t.ITEM_CODE,t.INV_INVENTORY_ID,sum(t.PICKED_QTY) PICKED_QTY "
 						+ "  from oub_pick_detail t where t.SHIPMENT_NO="
 						+ "  (select SHIPMENT_NO from oub_shipment_header where SHIPMENT_NO='"+shipmentNo+"' "
 						+ "  and WAREHOUSE_CODE='"+warehouseCode+"' limit 1) and t.`STATUS`<>'999' "
-						+ "  group by t.STORER_CODE,t.WAREHOUSE_CODE,t.SHIPMENT_NO,t.SHIPMENT_LINE_NO,t.ITEM_CODE,t.INV_INVENTORY_ID) opd on ii.INV_INVENTORY_ID=opd.INV_INVENTORY_ID "
+						+ "  group by t.STORER_CODE,t.WAREHOUSE_CODE,t.SHIPMENT_NO,t.ITEM_CODE,t.INV_INVENTORY_ID) opd on ii.INV_INVENTORY_ID=opd.INV_INVENTORY_ID "
 						+"inner join oub_shipment_header osh on osh.STORER_CODE=opd.STORER_CODE and osh.WAREHOUSE_CODE=opd.WAREHOUSE_CODE and osh.SHIPMENT_NO=opd.SHIPMENT_NO "
 						+" set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(opd.PICKED_QTY),"
 						+ "ii.PICKED_QTY=ii.PICKED_QTY-(opd.PICKED_QTY),"
