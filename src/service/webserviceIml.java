@@ -144,7 +144,7 @@ public class webserviceIml {
 						+ "  from oub_pick_detail t where t.SHIPMENT_NO="
 						+ "  (select SHIPMENT_NO from oub_shipment_header where SHIPMENT_NO='"+shipmentNo+"' "
 						+ "  and WAREHOUSE_CODE='"+warehouseCode+"' limit 1) and t.`STATUS`<>'999' "
-						+ "  group by t.STORER_CODE,t.WAREHOUSE_CODE,t.SHIPMENT_NO,t.ITEM_CODE,t.INV_INVENTORY_ID) opd on ii.INV_INVENTORY_ID=opd.INV_INVENTORY_ID "
+						+ "  group by t.STORER_CODE,t.WAREHOUSE_CODE,t.SHIPMENT_NO,t.ITEM_CODE,t.INV_INVENTORY_ID) opd on ii.INV_INVENTORY_ID=opd.INV_INVENTORY_ID and ii.ITEM_CODE=opd.ITEM_CODE "
 						+"inner join oub_shipment_header osh on osh.STORER_CODE=opd.STORER_CODE and osh.WAREHOUSE_CODE=opd.WAREHOUSE_CODE and osh.SHIPMENT_NO=opd.SHIPMENT_NO "
 						+" set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(opd.PICKED_QTY),"
 						+ "ii.PICKED_QTY=ii.PICKED_QTY-(opd.PICKED_QTY),"
@@ -162,38 +162,38 @@ public class webserviceIml {
 						return "ERR-ÔËµ¥ºÅ£º"+trackingNo+" ¿Û¼õ¿â´æÊ§°Ü";
 					}else{
 						//¸ù¾Ý²Ö¿âÐÅÏ¢£¬ÅÐ¶ÏÊÇ·ñÐèÒªµ÷ÓÃ½Ó¿Ú£¬¿Û¼õº£¹ØÕË²á¿â´æ
-						sql = "select * from bas_warehouse where WAREHOUSE_CODE='"+warehouseCode+"'";
-						dm = DBOperator.DoSelect2DM(sql);
-						if(dm.getString("IS_PUSH_CUSTOM", 0).equalsIgnoreCase("Y")){
-							//½Ó¿ÚÍÆËÍº£¹Ø¿Û¼õ    º£¹ØÕË²á¿â´æ
-							sql = "select IS_PUSH_CUSTOM from oub_shipment_header "
-									+ "where shipment_no='"+shipmentNo+"' and WAREHOUSE_CODE='"+warehouseCode+"'";
-							dm = DBOperator.DoSelect2DM(sql);
-							//·ÀÖ¹ÖØ¸´ÍÆËÍº£¹Ø¿Û¼õÕË²á¿â´æ
-							if(dm.getString("IS_PUSH_CUSTOM", 0).equalsIgnoreCase("N")){
-								sql = "select a.EXTERNAL_ORDER_NO orderSn,a.TRANSFER_ORDER_NO,b.ITEM_CODE sourceNo,b.OQC_QTY inOutAmount "
-										+ "from oub_shipment_header a "
-										+ "inner join oub_shipment_detail b on a.shipment_no=b.shipment_no and a.warehouse_code=b.warehouse_code "
-										+ "where a.shipment_no='"+shipmentNo+"' "
-										+ "and a.WAREHOUSE_CODE='"+warehouseCode+"' ";
-								dm = DBOperator.DoSelect2DM(sql);
-								String jsonData = DBOperator.DataManager2JSONString(dm, "productDeatil");
-								JSONObject dataJson = JSONObject.fromObject(jsonData);
-								try{
-								String postResult =  new HttpMethod().httpPost_manInOutStock(dm.getString("TRANSFER_ORDER_NO", 0), dataJson.get("productDeatil").toString());
-								dataJson = JSONObject.fromObject(postResult);
-								if(dataJson.get("code").equals("0")){
-									sql = "update oub_shipment_header set IS_PUSH_CUSTOM='Y' "
-										+ "where shipment_no='"+shipmentNo+"' and WAREHOUSE_CODE='"+warehouseCode+"' ";
-									t = DBOperator.DoUpdate(sql);
-								}else{
-									LogInfo.appendLog("error","¿Û¼õº£¹ØÕË²á¿â´æÊ§°Ü\n"+postResult+"\n"+jsonData);
-								}
-								}catch(Exception e){
-									LogInfo.appendLog("error","¿Û¼õº£¹ØÕË²á¿â´æÊ§°Ü"+"\n"+jsonData);
-								}
-							}
-						}
+//						sql = "select * from bas_warehouse where WAREHOUSE_CODE='"+warehouseCode+"'";
+//						dm = DBOperator.DoSelect2DM(sql);
+//						if(dm.getString("IS_PUSH_CUSTOM", 0).equalsIgnoreCase("Y")){
+//							//½Ó¿ÚÍÆËÍº£¹Ø¿Û¼õ    º£¹ØÕË²á¿â´æ
+//							sql = "select IS_PUSH_CUSTOM from oub_shipment_header "
+//									+ "where shipment_no='"+shipmentNo+"' and WAREHOUSE_CODE='"+warehouseCode+"'";
+//							dm = DBOperator.DoSelect2DM(sql);
+//							//·ÀÖ¹ÖØ¸´ÍÆËÍº£¹Ø¿Û¼õÕË²á¿â´æ
+//							if(dm.getString("IS_PUSH_CUSTOM", 0).equalsIgnoreCase("N")){
+//								sql = "select a.EXTERNAL_ORDER_NO orderSn,a.TRANSFER_ORDER_NO,b.ITEM_CODE sourceNo,b.OQC_QTY inOutAmount "
+//										+ "from oub_shipment_header a "
+//										+ "inner join oub_shipment_detail b on a.shipment_no=b.shipment_no and a.warehouse_code=b.warehouse_code "
+//										+ "where a.shipment_no='"+shipmentNo+"' "
+//										+ "and a.WAREHOUSE_CODE='"+warehouseCode+"' ";
+//								dm = DBOperator.DoSelect2DM(sql);
+//								String jsonData = DBOperator.DataManager2JSONString(dm, "productDeatil");
+//								JSONObject dataJson = JSONObject.fromObject(jsonData);
+//								try{
+//								String postResult =  new HttpMethod().httpPost_manInOutStock(dm.getString("TRANSFER_ORDER_NO", 0), dataJson.get("productDeatil").toString());
+//								dataJson = JSONObject.fromObject(postResult);
+//								if(dataJson.get("code").equals("0")){
+//									sql = "update oub_shipment_header set IS_PUSH_CUSTOM='Y' "
+//										+ "where shipment_no='"+shipmentNo+"' and WAREHOUSE_CODE='"+warehouseCode+"' ";
+//									t = DBOperator.DoUpdate(sql);
+//								}else{
+//									LogInfo.appendLog("error","¿Û¼õº£¹ØÕË²á¿â´æÊ§°Ü\n"+postResult+"\n"+jsonData);
+//								}
+//								}catch(Exception e){
+//									LogInfo.appendLog("error","¿Û¼õº£¹ØÕË²á¿â´æÊ§°Ü"+"\n"+jsonData);
+//								}
+//							}
+//						}
 						
 						
 						sql = "select CONFIG_VALUE1,CONFIG_VALUE2 from sys_config_detail where CONFIG_CODE='IS_REDUCE_MATERIAL' and CONFIG_VALUE1='1' ";
@@ -1180,7 +1180,8 @@ public class webserviceIml {
 				+"from inv_inventory ii "
 				+"inner join bas_item bi on ii.STORER_CODE=bi.STORER_CODE and ii.ITEM_CODE=bi.ITEM_CODE "
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
-				+"where ii.LOCATION_CODE like '%"+LOCATION_CODE+"%' and bi.ITEM_BAR_CODE like '%"+ITEM_BAR_CODE+"%' "
+				+"where ii.STATUS='ACTIVE' and ii.ON_HAND_QTY>0 and "
+				+ "ii.LOCATION_CODE like '%"+LOCATION_CODE+"%' and bi.ITEM_BAR_CODE like '%"+ITEM_BAR_CODE+"%' "
 				+"GROUP BY ii.LOCATION_CODE,bi.ITEM_BAR_CODE,bi.ITEM_NAME ";
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
