@@ -1074,7 +1074,7 @@ public class webserviceIml {
 //		}
 		String WAREHOUSE_CODE = tmpDM.getString("WAREHOUSE_CODE", 0);
 		sql = "update inv_inventory set location_code='"+LOCATION_CODE+"' "
-			+ "where WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' container_code='"+CONTAINER_CODE+"' ";
+			+ "where WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' and container_code='"+CONTAINER_CODE+"' ";
 		int t = DBOperator.DoUpdate(sql);
 		if(t==0){
 			return "ERR-上架失败，未找到数据,库位："+LOCATION_CODE+"，箱号："+CONTAINER_CODE+"，请联系系统管理员";
