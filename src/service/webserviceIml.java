@@ -926,7 +926,7 @@ public class webserviceIml {
 			int t = DBOperator.DoUpdate(sql);
 			if(t>0){
 				//收货单明细操作成功后，更新PO明细实际收货数量
-				sql = "update inb_po_detail set RECEIVED_QTY=RECEIVED_QTY+("+SCAN_QTY+") "
+				sql = "update inb_po_detail set status='300',RECEIVED_QTY=RECEIVED_QTY+("+SCAN_QTY+") "
 						+" where PO_NO='"+poNo+"' and LINE_NUMBER="+poLineNumber+" and ITEM_CODE='"+itemCode+"' ";
 				int poUpdate = DBOperator.DoUpdate(sql);
 				if(poUpdate==1){
