@@ -559,13 +559,18 @@ public class webserviceIml {
 		if (!itemBarCode.equals("")) {
 			dm = DBOperator.DoSelect2DM(sql);
 			if (dm == null || dm.getCurrentCount() == 0) {
-				sql = "select item_code,unit_code,item_name from bas_item "
+				sql = "select STORER_CODE,item_code,unit_code,item_name from bas_item "
 						+ "where item_bar_code='"+itemBarCode+"'";
 				dm = DBOperator.DoSelect2DM(sql);
 				if (dm == null || dm.getCurrentCount() == 0) {
 					itemCode = itemBarCode;
 					unitCode = "007";
 					itemName = itemBarCode;
+				}else{
+					itemCode = dm.getString("item_code", 0);
+					unitCode = dm.getString("unit_code", 0);
+					itemName = dm.getString("item_name", 0);
+					storerCode = dm.getString("STORER_CODE", 0);
 				}
 			}else{
 				itemCode = dm.getString("item_code", 0);
@@ -1176,7 +1181,8 @@ public class webserviceIml {
 	@WebResult(name = "return_getInvList")
 	public String getInvList(@WebParam(name = "LOCATION_CODE", partName = "LOCATION_CODE") String LOCATION_CODE,
 			@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE) {
-		String sql = "select ii.LOCATION_CODE,bi.ITEM_BAR_CODE,bi.ITEM_NAME,sum(ii.ON_HAND_QTY+ii.IN_TRANSIT_QTY-(ii.PICKED_QTY)-(ii.ALLOCATED_QTY)) QTY,biu.unit_name "
+		String sql = "select case when ifnull(ii.LOCATION_CODE,'')='' then '.' else ii.LOCATION_CODE end LOCATION_CODE"
+				+ ",bi.ITEM_BAR_CODE,bi.ITEM_NAME,sum(ii.ON_HAND_QTY+ii.IN_TRANSIT_QTY-(ii.PICKED_QTY)-(ii.ALLOCATED_QTY)) QTY,biu.unit_name "
 				+"from inv_inventory ii "
 				+"inner join bas_item bi on ii.STORER_CODE=bi.STORER_CODE and ii.ITEM_CODE=bi.ITEM_CODE "
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
