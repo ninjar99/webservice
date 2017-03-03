@@ -391,6 +391,31 @@ public class webserviceIml {
 	}
 	
 	/**
+	 * 条码查找商品信息
+	 * 只根据条码+仓库号查询
+	 * 
+	 * @param
+	 * @return
+	 */
+	@WebResult(name = "return_ItemInfo")
+	public String getItemInfoByBarcodeByWarehouse(@WebParam(name = "WAREHOUSE_CODE", partName = "WAREHOUSE_CODE") String WAREHOUSE_CODE,
+			@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE) {
+		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
+				+"from bas_item bi "
+				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
+				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+				+"where bi.ITEM_BAR_CODE='"+ITEM_BAR_CODE+"' "
+				+ "and bi.ITEM_CODE in (select ITEM_CODE from inv_inventory where WAREHOUSE_CODE='"+WAREHOUSE_CODE+"') "
+				+ "limit 1 ";
+		if (sqlValidate(sql)) {
+			DataManager dm = DBOperator.DoSelect2DM(sql);
+			String ret = DBOperator.DataManager2JSONString(dm, "");
+			return ret;
+		}
+		return "";
+	}
+	
+	/**
 	 * 盘点扫描条码
 	 * 
 	 * @param
@@ -1188,6 +1213,33 @@ public class webserviceIml {
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
 				+"where ii.STATUS='ACTIVE' and ii.ON_HAND_QTY>0 and "
 				+ "ii.LOCATION_CODE like '%"+LOCATION_CODE+"%' and bi.ITEM_BAR_CODE like '%"+ITEM_BAR_CODE+"%' "
+				+"GROUP BY ii.LOCATION_CODE,bi.ITEM_BAR_CODE,bi.ITEM_NAME ";
+		if (sqlValidate(sql)) {
+			DataManager dm = DBOperator.DoSelect2DM(sql);
+			String ret = DBOperator.DataManager2JSONString(dm, "");
+			return ret;
+		}
+		return "";
+	}
+	
+	/**
+	 * 库存查询-按仓库查询
+	 * 
+	 * @param
+	 * @return
+	 */
+	@WebResult(name = "return_getInvList")
+	public String getInvListByWarehouse(@WebParam(name = "WAREHOUSE_CODE", partName = "WAREHOUSE_CODE") String WAREHOUSE_CODE,
+			@WebParam(name = "LOCATION_CODE", partName = "LOCATION_CODE") String LOCATION_CODE,
+			@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE) {
+		String sql = "select case when ifnull(ii.LOCATION_CODE,'')='' then '.' else ii.LOCATION_CODE end LOCATION_CODE"
+				+ ",bi.ITEM_BAR_CODE,bi.ITEM_NAME,sum(ii.ON_HAND_QTY+ii.IN_TRANSIT_QTY-(ii.PICKED_QTY)-(ii.ALLOCATED_QTY)) QTY,biu.unit_name "
+				+"from inv_inventory ii "
+				+"inner join bas_item bi on ii.STORER_CODE=bi.STORER_CODE and ii.ITEM_CODE=bi.ITEM_CODE "
+				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+				+"where ii.STATUS='ACTIVE' and ii.ON_HAND_QTY>0 and (ii.ON_HAND_QTY-(ii.ALLOCATED_QTY)-(ii.PICKED_QTY))>0 and  "
+				+ "ii.LOCATION_CODE like '%"+LOCATION_CODE+"%' and bi.ITEM_BAR_CODE like '%"+ITEM_BAR_CODE+"%' "
+				+ "and ii.WAREHOUSE_CODE like '%"+WAREHOUSE_CODE+"%' "
 				+"GROUP BY ii.LOCATION_CODE,bi.ITEM_BAR_CODE,bi.ITEM_NAME ";
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
