@@ -400,6 +400,7 @@ public class webserviceIml {
 	@WebResult(name = "return_ItemInfo")
 	public String getItemInfoByBarcodeByWarehouse(@WebParam(name = "WAREHOUSE_CODE", partName = "WAREHOUSE_CODE") String WAREHOUSE_CODE,
 			@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE) {
+		//优先查找本仓库商品编码，如果查不到，再扩展到其他仓库
 		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
@@ -409,6 +410,15 @@ public class webserviceIml {
 				+ "limit 1 ";
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
+			if(dm.getCurrentCount()==0){
+				sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
+						+"from bas_item bi "
+						+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
+						+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
+						+"where bi.ITEM_BAR_CODE='"+ITEM_BAR_CODE+"' "
+						+ "limit 1 ";
+				dm = DBOperator.DoSelect2DM(sql);
+			}
 			String ret = DBOperator.DataManager2JSONString(dm, "");
 			return ret;
 		}
