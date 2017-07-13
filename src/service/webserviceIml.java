@@ -574,7 +574,8 @@ public class webserviceIml {
 			@WebParam(name = "CONTAINER_CODE", partName = "CONTAINER_CODE") String CONTAINER_CODE,
 			@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE,
 			@WebParam(name = "itemQty", partName = "itemQty") String itemQty,
-			@WebParam(name = "userCode", partName = "userCode") String userCode) {
+			@WebParam(name = "userCode", partName = "userCode") String userCode,
+			@WebParam(name = "itemDate", partName = "itemDate") String itemDate) {
 		String itemCode = "";
 		String itemBarCode = ITEM_BAR_CODE;
 		String storerCode = "";
@@ -613,19 +614,22 @@ public class webserviceIml {
 				itemName = dm.getString("item_name", 0);
 			}
 			sql = "select STOCKTAKE_NO,STORER_CODE,WAREHOUSE_CODE,LOCATION_CODE,CONTAINER_CODE,ITEM_CODE "
-					+"from inv_stocktake_detail isd "
-					+" where isd.STOCKTAKE_NO='"+stockTakeNo+"' and isd.STORER_CODE='"+storerCode+"' "
-					+" and isd.WAREHOUSE_CODE = '"+warehouseCode+"' and isd.LOCATION_CODE='"+locationCode+"' "
-					+" and isd.CONTAINER_CODE='"+containerCode+"' and isd.ITEM_CODE='"+itemCode+"' ";
+				+"from inv_stocktake_detail isd "
+				+" where isd.STOCKTAKE_NO='"+stockTakeNo+"' and isd.STORER_CODE='"+storerCode+"' "
+				+" and isd.WAREHOUSE_CODE = '"+warehouseCode+"' and isd.LOCATION_CODE='"+locationCode+"' "
+				+" and isd.CONTAINER_CODE='"+containerCode+"' and isd.ITEM_CODE='"+itemCode+"' "
+				+ "and ifnull(isd.USER_DEF1,'')='"+itemDate+"' ";
 			dm = DBOperator.DoSelect2DM(sql);
 			if(dm == null || dm.getCurrentCount() == 0){
 				//插入盘点新纪录
 				sql = "insert into inv_stocktake_detail(STOCKTAKE_NO,STORER_CODE,WAREHOUSE_CODE,LOCATION_CODE,CONTAINER_CODE,"
-						+"ITEM_CODE,GUIDE_QTY,GUIDE_UOM,CONF_QTY,CONF_UOM,FIRST_STOCKTAKE_QTY,FIRST_STOCKTAKE_UOM,CREATED_BY_USER,CREATED_DTM_LOC,UPDATED_BY_USER,UPDATED_DTM_LOC) "
+						+"ITEM_CODE,GUIDE_QTY,GUIDE_UOM,CONF_QTY,CONF_UOM,FIRST_STOCKTAKE_QTY,FIRST_STOCKTAKE_UOM,"
+						+ "USER_DEF1,CREATED_BY_USER,CREATED_DTM_LOC,UPDATED_BY_USER,UPDATED_DTM_LOC) "
 						+"select '"+stockTakeNo+"','"+storerCode+"','"+warehouseCode+"','"+locationCode+"','"+containerCode+"', "
 						+"'"+itemCode+"',"
 						+"ifnull((select sum(ii.ON_HAND_QTY+IN_TRANSIT_QTY-(ALLOCATED_QTY)-(PICKED_QTY)-(INACTIVE_QTY)) qty from inv_inventory ii where ii.STORER_CODE='"+storerCode+"' and ii.WAREHOUSE_CODE='"+warehouseCode+"' and ii.ITEM_CODE='"+itemCode+"' and ii.LOCATION_CODE='"+locationCode+"' and ii.CONTAINER_CODE='"+containerCode+"'),0),"
-						+"'"+unitCode+"',"+itemQty+",'"+unitCode+"',"+itemQty+",'"+unitCode+"','"+userCode+"',now(),'"+userCode+"',now() "
+						+"'"+unitCode+"',"+itemQty+",'"+unitCode+"',"+itemQty+",'"+unitCode+"',"
+						+ "'"+itemDate+"','"+userCode+"',now(),'"+userCode+"',now() "
 						+"";
 				int t = DBOperator.DoUpdate(sql);
 				if(t==0){
@@ -657,11 +661,13 @@ public class webserviceIml {
 				}
 			}else{
 				//更新盘点数量
-				sql = "update inv_stocktake_detail isd set CONF_QTY=CONF_QTY+("+itemQty+"),FIRST_STOCKTAKE_QTY=FIRST_STOCKTAKE_QTY+("+itemQty+"),"
-						+ "UPDATED_BY_USER='"+userCode+"',UPDATED_DTM_LOC=now() "
-						+" where isd.STOCKTAKE_NO='"+stockTakeNo+"' and isd.STORER_CODE='"+storerCode+"' "
-						+" and isd.WAREHOUSE_CODE = '"+warehouseCode+"' and isd.LOCATION_CODE='"+locationCode+"' "
-						+" and isd.CONTAINER_CODE='"+containerCode+"' and isd.ITEM_CODE='"+itemCode+"' ";
+				sql = "update inv_stocktake_detail isd set CONF_QTY=CONF_QTY+("+itemQty+"),"
+					+ "FIRST_STOCKTAKE_QTY=FIRST_STOCKTAKE_QTY+("+itemQty+"),"
+					+ "USER_DEF1='"+itemDate+"',"
+					+ "UPDATED_BY_USER='"+userCode+"',UPDATED_DTM_LOC=now() "
+					+" where isd.STOCKTAKE_NO='"+stockTakeNo+"' and isd.STORER_CODE='"+storerCode+"' "
+					+" and isd.WAREHOUSE_CODE = '"+warehouseCode+"' and isd.LOCATION_CODE='"+locationCode+"' "
+					+" and isd.CONTAINER_CODE='"+containerCode+"' and isd.ITEM_CODE='"+itemCode+"' ";
 				int t = DBOperator.DoUpdate(sql);
 				if(t==0){;
 					return "ERR-更新盘点明细失败\n"+itemBarCode+"："+itemName+" 盘点数量："+itemQty;
@@ -691,7 +697,6 @@ public class webserviceIml {
 					return "OK-"+itemBarCode+" "+itemQty;
 				}
 			}
-			
 		}else{
 			return "ERR-商品条码不能为空!";
 		}
