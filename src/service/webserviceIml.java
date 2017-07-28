@@ -1,6 +1,8 @@
 package service;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 import javax.jws.WebParam;
@@ -60,13 +62,29 @@ public class webserviceIml {
 	public String getLogin(@WebParam(name = "userCode", partName = "userCode") String userCode,
 			@WebParam(name = "password", partName = "password") String password) {
 		String passwordstr = MD5.GetMD5Code(password);
-		String sql = "select WAREHOUSE_CODE,USER_CODE,USER_NAME,ROLE_NAME,ACTIVE from sys_user "
-				+ "where (user_code= '" + userCode + "' or login_code = '" + userCode + "') and password='" + passwordstr
-				+ "' ";
+		String sql = "select WAREHOUSE_CODE,USER_CODE,LOGIN_CODE,USER_NAME,ROLE_NAME,ACTIVE,CREATED_DTM_LOC,password "
+				+ "from sys_user "
+				+ "where (user_code= '" + userCode + "' or login_code = '" + userCode + "') ";
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
-			String ret = DBOperator.DataManager2JSONString(dm, "getLogin");
-			return ret;
+			SimpleDateFormat sdf =   new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			long timeInMillis = 0;
+			try {
+				timeInMillis = sdf.parse(dm.getString("CREATED_DTM_LOC", 0)).getTime();
+			} catch (ParseException e1) {
+				timeInMillis = 0;
+			}
+			// input_pwd_md5为用户输入的明文密码在js进行MD5加密后传输的密码
+			String reslut_pwd_md5 = MD5.GetMD5Code(dm.getString("USER_CODE", 0) + timeInMillis) 
+					+ MD5.GetMD5Code(password) + 
+					MD5.GetMD5Code(dm.getString("LOGIN_CODE", 0));
+			LogInfo.appendLog("sql",reslut_pwd_md5);
+			if(dm.getString("password", 0).equalsIgnoreCase(reslut_pwd_md5)){
+				String ret = DBOperator.DataManager2JSONString(dm, "getLogin");
+				return ret;
+			}else{
+				return "";
+			}
 		}
 		return "";
 	}
