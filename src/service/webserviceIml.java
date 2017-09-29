@@ -1136,6 +1136,9 @@ public class webserviceIml {
 //			return "ERR-该箱号之前有收货完成未上架的任务，不能重复使用该箱号上架";
 //		}
 		String WAREHOUSE_CODE = tmpDM.getString("WAREHOUSE_CODE", 0);
+		if(!comData.checkPOCanPutaway(WAREHOUSE_CODE,CONTAINER_CODE)){
+			return "ERR-PO需要在AOS做实收审核后才能做上架操作";
+		}
 		sql = "update inv_inventory set location_code='"+LOCATION_CODE+"' "
 			+ "where WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' and container_code='"+CONTAINER_CODE+"' ";
 		int t = DBOperator.DoUpdate(sql);

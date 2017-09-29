@@ -369,6 +369,21 @@ public class comData {
 		return sb.toString();
 	}
 	
+	//如果该仓库设置PO需要收货完成后点击确认才能上架，需要判断PO表头是否已经审核
+	public static boolean checkPOCanPutaway(String WAREHOUSE_CODE,String CONTAINER_CODE){
+		String sql = "select b.PO_NO from inb_receipt_detail a "
+				+ "inner join inb_po_header b on a.WAREHOUSE_CODE=b.WAREHOUSE_CODE and a.PO_NO=b.PO_NO "
+				+ "inner join bas_warehouse c on b.WAREHOUSE_CODE=c.WAREHOUSE_CODE "
+				+ "where a.WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' and a.CONTAINER_CODE='"+CONTAINER_CODE+"' and b.`STATUS`<=300 "
+				+ "and c.IS_PO_PUTAWAY_NEED_AUDIT='Y' and b.IS_PO_PUTAWAY_NEED_AUDIT='N'";
+		DataManager dm = DBOperator.DoSelect2DM(sql);
+		if(dm.getCurrentCount()>0){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
 	public static void main(String[] args){
 //		DataManager dm = getSysProcessHistoryDataModel("sys_process_history");
 //		if (dm!=null) {
