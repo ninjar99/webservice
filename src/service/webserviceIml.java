@@ -1147,8 +1147,8 @@ public class webserviceIml {
 		}else{
 			//如果周装箱 use_type=temp (临时)，上架后更新库存Container_code = '*'，同时收货周装箱  status='0'
 			sql = "select ii.INV_INVENTORY_ID,ii.WAREHOUSE_CODE,ii.STORER_CODE,ii.ITEM_CODE,ii.LOT_NO,ii.LOCATION_CODE,bc.USE_TYPE,ii.CONTAINER_CODE,ii.ON_HAND_QTY "
-					+"from inv_inventory ii inner join bas_container bc on ii.WAREHOUSE_CODE=bc.WAREHOUSE_CODE and ii.CONTAINER_CODE=bc.CONTAINER_CODE "
-					+"where ii.WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' and ii.LOCATION_CODE='"+LOCATION_CODE+"' and ii.CONTAINER_CODE='"+CONTAINER_CODE+"' ";
+				+"from inv_inventory ii inner join bas_container bc on ii.WAREHOUSE_CODE=bc.WAREHOUSE_CODE and ii.CONTAINER_CODE=bc.CONTAINER_CODE "
+				+"where ii.WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' and ii.LOCATION_CODE='"+LOCATION_CODE+"' and ii.CONTAINER_CODE='"+CONTAINER_CODE+"' ";
 			DataManager dm = DBOperator.DoSelect2DM(sql);
 			if(dm==null || dm.getCurrentCount()==0){
 				return "ERR-上架失败，更新到上架库位失败，请联系系统管理员";
@@ -1171,17 +1171,16 @@ public class webserviceIml {
 						//释放箱号状态
 						sql = "update bas_container set status='0',UPDATED_BY_USER='"+userCode+"',UPDATED_DTM_LOC=now(),USER_DEF1='入库上架成功' where container_code='"+CONTAINER_CODE+"' ";
 						t = DBOperator.DoUpdate(sql);
-						if(t>0){
+						if(t>=0){
 							//上架成功，原先库存行记录(container_code <> *)
 							sql = "delete from inv_inventory "
 								+ "where INV_INVENTORY_ID='"+INV_INVENTORY_ID+"' and LOCATION_CODE='"+LOCATION_CODE+"' and CONTAINER_CODE='"+CONTAINER_CODE+"' ";
 							t = DBOperator.DoUpdate(sql);
 							//更改库位为已使用状态
 							sql = "update bas_location set STATUS='storage',UPDATED_BY_USER='"+userCode+"',UPDATED_DTM_LOC=now(),USER_DEF1='入库上架' "
-									+"where status='empty' and LOCATION_CODE='"+LOCATION_CODE+"' and WAREHOUSE_CODE in "
-									+"(select WAREHOUSE_CODE from inv_inventory where container_code='"+CONTAINER_CODE+"') ";
+								+"where status='empty' and LOCATION_CODE='"+LOCATION_CODE+"' and WAREHOUSE_CODE in "
+								+"(select WAREHOUSE_CODE from inv_inventory where container_code='"+CONTAINER_CODE+"') ";
 							DBOperator.DoUpdate(sql);
-							return "OK-上架成功";
 						}else{
 							return "ERR-上架失败，释放箱号："+CONTAINER_CODE+" 失败，请联系系统管理员";
 						}
@@ -1192,11 +1191,11 @@ public class webserviceIml {
 					//更新箱号
 					sql = "update bas_container set UPDATED_DTM_LOC=now(),USER_DEF1='入库上架成功' where container_code='"+CONTAINER_CODE+"' ";
 					t = DBOperator.DoUpdate(sql);
-					if(t>0){
+					if(t>=0){
 						//更改库位为已使用状态
 						sql = "update bas_location set STATUS='storage',UPDATED_BY_USER='"+userCode+"',UPDATED_DTM_LOC=now(),USER_DEF1='入库上架' "
-								+"where status='empty' and LOCATION_CODE='"+LOCATION_CODE+"' and WAREHOUSE_CODE in "
-								+"(select WAREHOUSE_CODE from inv_inventory where container_code='"+CONTAINER_CODE+"') ";
+							+"where status='empty' and LOCATION_CODE='"+LOCATION_CODE+"' and WAREHOUSE_CODE in "
+							+"(select WAREHOUSE_CODE from inv_inventory where container_code='"+CONTAINER_CODE+"') ";
 						DBOperator.DoUpdate(sql);
 						//记录操作日志
 						DataManager dmProcess = comData.getSysProcessHistoryDataModel("sys_process_history");
@@ -1218,19 +1217,17 @@ public class webserviceIml {
 							dmProcess.AddNewRow(list);
 							boolean bool = comData.addSysProcessHistory("sys_process_history", dmProcess);
 						}
-						return "OK-上架成功";
 					}else{
 						return "ERR-上架失败，释放箱号："+CONTAINER_CODE+" 失败，请联系系统管理员";
 					}
 				}
-				
 			}
+			return "OK-上架成功";//循环全部结束后，如果无异常，返回上架成功
 //			else{
 //				return "ERR-上架失败\n当前库位："+LOCATION_CODE+"，箱号："+CONTAINER_CODE+" \n之前有未完成的上架任务，请联系系统管理员";
 //			}
 
 		}
-		return "OK-上架成功";
 	}
 	
 	/**
@@ -1597,11 +1594,11 @@ public class webserviceIml {
 //		System.out.println(new webserviceIml().savePODetail("PO00000049","15.10.12","0001","hz","0094-00194","8","瓶","lot1","","","","","","","","","lot10"));
 //		System.out.println(new webserviceIml().createReceiptHeader("PO00000053","sys"));
 //		System.out.println(new webserviceIml().createReceiptDetail("IN00000091","PO00000053","8806173556151","C000000010","100","sys"));
-		System.out.println(new webserviceIml().generateInventoryByReceived("IN00000295","sys"));
+//		System.out.println(new webserviceIml().generateInventoryByReceived("IN00000295","sys"));
 //		System.out.println(new webserviceIml().checkReceivedContainerCode("C000000001"));
 //		System.out.println(new webserviceIml().getSysSuggestLocation("C000000001"));
 //		System.out.println(new webserviceIml().checkPutawayDestLocationCode("HZ-H16-B-3"));
-//		System.out.println(new webserviceIml().putawayConfirm("HZ-H0-D-2","C000000005","sys"));
+		System.out.println(new webserviceIml().putawayConfirm("HZGR-01-01-04","C000001009","sys"));
 //		System.out.println(new webserviceIml().getInvList("HZ-H0","8"));
 //		System.out.println(new webserviceIml().getWarehouseList());
 //		System.out.println(new webserviceIml().invMove("hz","HZ-H1-B-2","*","4518216400300","1","HZ-H2-A-3","C000000033","sys"));
