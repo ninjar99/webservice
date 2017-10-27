@@ -373,7 +373,8 @@ public class webserviceIml {
 	@WebResult(name = "return_ItemInfo")
 	public String getItemInfoByBarcode(@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE,
 			@WebParam(name = "STORER_CODE", partName = "STORER_CODE") String STORER_CODE) {
-		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
+		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,"
+				+ "ifnull(bi.PORT_CODE,'0') PORT_CODE,biu.unit_name "
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
