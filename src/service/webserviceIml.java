@@ -374,7 +374,8 @@ public class webserviceIml {
 	public String getItemInfoByBarcode(@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE,
 			@WebParam(name = "STORER_CODE", partName = "STORER_CODE") String STORER_CODE) {
 		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,"
-				+ "ifnull(bi.PORT_CODE,'0') PORT_CODE,biu.unit_name "
+				+ "if(ifnull(bi.PORT_CODE,'0')='','0',ifnull(bi.PORT_CODE,'0')) PORT_CODE,"
+				+ "if(ifnull(biu.unit_name,'个')='','个',ifnull(biu.unit_name,'个')) unit_name "
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
@@ -396,7 +397,9 @@ public class webserviceIml {
 	 */
 	@WebResult(name = "return_ItemInfo")
 	public String getItemInfoByBarcodeTMP(@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE) {
-		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
+		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,"
+				+ "bi.ITEM_BAR_CODE,if(ifnull(bi.PORT_CODE,'0')='','0',ifnull(bi.PORT_CODE,'0')) PORT_CODE,"
+				+ "if(ifnull(biu.unit_name,'个')='','个',ifnull(biu.unit_name,'个')) unit_name "
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
@@ -420,7 +423,9 @@ public class webserviceIml {
 	public String getItemInfoByBarcodeByWarehouse(@WebParam(name = "WAREHOUSE_CODE", partName = "WAREHOUSE_CODE") String WAREHOUSE_CODE,
 			@WebParam(name = "ITEM_BAR_CODE", partName = "ITEM_BAR_CODE") String ITEM_BAR_CODE) {
 		//优先查找本仓库商品编码，如果查不到，再扩展到其他仓库
-		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
+		String sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,"
+				+ "bi.ITEM_BAR_CODE,if(ifnull(bi.PORT_CODE,'0')='','0',ifnull(bi.PORT_CODE,'0')) PORT_CODE,"
+				+ "if(ifnull(biu.unit_name,'个')='','个',ifnull(biu.unit_name,'个')) unit_name "
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
@@ -430,7 +435,9 @@ public class webserviceIml {
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
 			if(dm.getCurrentCount()==0){
-				sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,bi.ITEM_BAR_CODE,bi.PORT_CODE,biu.unit_name "
+				sql = "select bi.STORER_CODE,bs.STORER_NAME,bi.ITEM_CODE,bi.ITEM_NAME,"
+						+ "bi.ITEM_BAR_CODE,if(ifnull(bi.PORT_CODE,'0')='','0',ifnull(bi.PORT_CODE,'0')) PORT_CODE,"
+						+ "if(ifnull(biu.unit_name,'个')='','个',ifnull(biu.unit_name,'个')) unit_name "
 						+"from bas_item bi "
 						+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
 						+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
