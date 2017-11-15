@@ -1567,6 +1567,17 @@ public class webserviceIml {
 		return "";
 	}
 	
+	/**
+	 * 接收 杭州海关删单申请处理结果数据
+	 * 
+	 * @return
+	 */
+	@WebResult(name = "return_sendStockDeleteInfo")
+	public String sendStockDeleteInfo(@WebParam(name = "arg0", partName = "arg0") String arg0) {
+		LogInfo.appendLog("wmsnotify",arg0);
+		return "success";
+	}
+	
 	//效验
   protected static boolean sqlValidate(String str) {
       str = str.toLowerCase();//统一转为小写

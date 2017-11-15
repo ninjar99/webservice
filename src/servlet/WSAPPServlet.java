@@ -11,6 +11,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.xml.ws.Endpoint;
+
+import service.WMSNotify;
 import service.webserviceIml;
 
 public class WSAPPServlet extends HttpServlet{
@@ -27,6 +29,10 @@ public class WSAPPServlet extends HttpServlet{
 				System.out.println("已经启动WebService服务[http://0.0.0.0:7758/ws/aggwms]");
 				return;
 			}
+			if(isLoclePortUsing(7757)){
+				System.out.println("已经启动WebService服务[http://0.0.0.0:7757/ws/wmsnotify]");
+				return;
+			}
 			System.out.println("准备启动WebService服务[http://0.0.0.0:7758/ws/aggwms]");
 			// 发布一个WebService
 //			Endpoint endpoint =  Endpoint.publish("http://172.20.100.5:8419/ws/luolaiapp", new WSAPP());
@@ -35,6 +41,9 @@ public class WSAPPServlet extends HttpServlet{
 //			endpoint_ELT.getBinding();
 			Endpoint endpoint =  Endpoint.publish("http://0.0.0.0:7758/ws/aggwms", new webserviceIml());
 			endpoint.getBinding();
+			
+			Endpoint endpoint_wms_notify =  Endpoint.publish("http://0.0.0.0:7757/ws/wmsnotify", new WMSNotify());
+			endpoint_wms_notify.getBinding();
 			
 			System.out.println("已成功启动WebService服务[http://0.0.0.0:7758/ws/aggwms]");
 		} catch (ServletException e) {
