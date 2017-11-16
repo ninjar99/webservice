@@ -42,5 +42,16 @@ public class WMSNotify {
 		LogInfo.appendLog("wmsnotify",arg0);
 		return "success";
 	}
+	
+	/**
+	 * 接收 杭州海关归并关系发送数据
+	 * 
+	 * @return
+	 */
+	@WebResult(name = "return_sendMergerInfo")
+	public String sendMergerInfo(@WebParam(name = "content", partName = "content") String content) {
+		LogInfo.appendLog("wmsnotify",content);
+		return "success";
+	}
 
 }
