@@ -6,7 +6,7 @@
     <reloadable>true</reloadable>
     <redirectLogger>false</redirectLogger>
     <updateXml>true</updateXml>
-    <warLocation>D:\work\aggwebservice\webservice_aggwms.war</warLocation>
+    <warLocation>D:\work\aggwms\webservice_aggwms.war</warLocation>
     <extraInfo></extraInfo>
     <webPath></webPath>
 </tomcatProjectProperties>
