@@ -18,16 +18,16 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/ezmorph-1.0.3.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/json-lib-2.4-jdk15.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="TOMCAT_HOME/lib/servlet-api.jar"/>
-	<classpathentry kind="var" path="TOMCAT_HOME/lib/jasper.jar"/>
-	<classpathentry kind="var" path="TOMCAT_HOME/lib/jsp-api.jar"/>
-	<classpathentry kind="var" path="TOMCAT_HOME/lib/el-api.jar"/>
-	<classpathentry kind="var" path="TOMCAT_HOME/lib/annotations-api.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/AESEncrypt.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xom-1.2.6.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/DataManager.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/httpclient-4.2.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/httpcore-4.2.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/jsch-0.1.53.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/servlet-api.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/jasper.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/jsp-api.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/el-api.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/annotations-api.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>
