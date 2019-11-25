@@ -163,12 +163,12 @@ public class webserviceIml {
 						+ "  (select SHIPMENT_NO from oub_shipment_header where SHIPMENT_NO='"+shipmentNo+"' "
 						+ "  and WAREHOUSE_CODE='"+warehouseCode+"' limit 1) and t.`STATUS`<>'999' "
 						+ "  group by t.STORER_CODE,t.WAREHOUSE_CODE,t.SHIPMENT_NO,t.ITEM_CODE,t.INV_INVENTORY_ID) opd on ii.INV_INVENTORY_ID=opd.INV_INVENTORY_ID and ii.ITEM_CODE=opd.ITEM_CODE "
-						+"inner join oub_shipment_header osh on osh.STORER_CODE=opd.STORER_CODE and osh.WAREHOUSE_CODE=opd.WAREHOUSE_CODE and osh.SHIPMENT_NO=opd.SHIPMENT_NO "
+						//+"inner join oub_shipment_header osh on osh.STORER_CODE=opd.STORER_CODE and osh.WAREHOUSE_CODE=opd.WAREHOUSE_CODE and osh.SHIPMENT_NO=opd.SHIPMENT_NO "
 						+" set ii.ON_HAND_QTY=ii.ON_HAND_QTY-(opd.PICKED_QTY),"
 						+ "ii.PICKED_QTY=ii.PICKED_QTY-(opd.PICKED_QTY),"
 						+ "ii.OUB_TOTAL_QTY=ii.OUB_TOTAL_QTY+opd.PICKED_QTY "
 						+",ii.UPDATED_DTM_LOC=now(),ii.UPDATED_BY_USER='"+userCode+"'"
-						+"where osh.SHIPMENT_NO='"+shipmentNo+"' and osh.WAREHOUSE_CODE='"+warehouseCode+"' "
+						+"where opd.SHIPMENT_NO='"+shipmentNo+"' and opd.WAREHOUSE_CODE='"+warehouseCode+"' "
 						+"";
 					t = DBOperator.DoUpdate(sql);
 					if(t==0){
