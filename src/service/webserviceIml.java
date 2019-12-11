@@ -379,7 +379,8 @@ public class webserviceIml {
 				+"from bas_item bi "
 				+"inner join bas_storer bs on bi.STORER_CODE=bs.STORER_CODE "
 				+"left join bas_item_unit biu on bi.UNIT_CODE=biu.unit_code "
-				+"where bi.STORER_CODE='"+STORER_CODE+"' and bi.ITEM_BAR_CODE='"+ITEM_BAR_CODE+"' limit 1 ";
+				+"where bi.STORER_CODE='"+STORER_CODE+"' and bi.ITEM_BAR_CODE='"+ITEM_BAR_CODE+"' "
+				+ "order by CREATED_DTM_LOC desc limit 1 ";
 		if (sqlValidate(sql)) {
 			DataManager dm = DBOperator.DoSelect2DM(sql);
 			String ret = DBOperator.DataManager2JSONString(dm, "");
