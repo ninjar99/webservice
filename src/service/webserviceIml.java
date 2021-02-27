@@ -618,26 +618,27 @@ public class webserviceIml {
 		warehouseCode = dm.getString("WAREHOUSE_CODE", 0);
 		
 		sql = "select item_code,unit_code,item_name from bas_item "
-			+ "where STORER_CODE='"+storerCode+"' and warehouse_code='"+warehouseCode+"' and item_bar_code='"+itemBarCode+"'";
+			+ "where STORER_CODE='"+storerCode+"' and warehouse_code='"+warehouseCode+"' and item_bar_code='"+itemBarCode+"' "
+			+ " order by BAS_ITEM_ID desc";
 		if (!itemBarCode.equals("")) {
 			dm = DBOperator.DoSelect2DM(sql);
-			if(dm.getCurrentCount()==1){
+			if(dm.getCurrentCount()>=1){
 				itemCode = dm.getString("item_code", 0);
 				unitCode = dm.getString("unit_code", 0);
 				itemName = dm.getString("item_name", 0);
 				storerCode = dm.getString("STORER_CODE", 0);
 			}else{
 				sql = "select item_code,unit_code,item_name from bas_item "
-					+ "where STORER_CODE='"+storerCode+"' and item_bar_code='"+itemBarCode+"'";
+					+ "where STORER_CODE='"+storerCode+"' and item_bar_code='"+itemBarCode+"' order by BAS_ITEM_ID desc";
 				dm = DBOperator.DoSelect2DM(sql);
-				if(dm.getCurrentCount()==1){
+				if(dm.getCurrentCount()>=1){
 					itemCode = dm.getString("item_code", 0);
 					unitCode = dm.getString("unit_code", 0);
 					itemName = dm.getString("item_name", 0);
 					storerCode = dm.getString("STORER_CODE", 0);
 				}else{
 					sql = "select STORER_CODE,item_code,unit_code,item_name from bas_item "
-							+ "where item_bar_code='"+itemBarCode+"'";
+						+ "where item_bar_code='"+itemBarCode+"' order by BAS_ITEM_ID desc";
 					dm = DBOperator.DoSelect2DM(sql);
 					if (dm == null || dm.getCurrentCount() == 0) {
 						itemCode = itemBarCode;
