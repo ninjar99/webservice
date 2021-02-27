@@ -618,28 +618,40 @@ public class webserviceIml {
 		warehouseCode = dm.getString("WAREHOUSE_CODE", 0);
 		
 		sql = "select item_code,unit_code,item_name from bas_item "
-			+ "where STORER_CODE='"+storerCode+"' and item_bar_code='"+itemBarCode+"'";
+			+ "where STORER_CODE='"+storerCode+"' and warehouse_code='"+warehouseCode+"' and item_bar_code='"+itemBarCode+"'";
 		if (!itemBarCode.equals("")) {
 			dm = DBOperator.DoSelect2DM(sql);
-			if (dm == null || dm.getCurrentCount() == 0) {
-				sql = "select STORER_CODE,item_code,unit_code,item_name from bas_item "
-						+ "where item_bar_code='"+itemBarCode+"'";
+			if(dm.getCurrentCount()==1){
+				itemCode = dm.getString("item_code", 0);
+				unitCode = dm.getString("unit_code", 0);
+				itemName = dm.getString("item_name", 0);
+				storerCode = dm.getString("STORER_CODE", 0);
+			}else{
+				sql = "select item_code,unit_code,item_name from bas_item "
+					+ "where STORER_CODE='"+storerCode+"' and item_bar_code='"+itemBarCode+"'";
 				dm = DBOperator.DoSelect2DM(sql);
-				if (dm == null || dm.getCurrentCount() == 0) {
-					itemCode = itemBarCode;
-					unitCode = "007";
-					itemName = itemBarCode;
-				}else{
+				if(dm.getCurrentCount()==1){
 					itemCode = dm.getString("item_code", 0);
 					unitCode = dm.getString("unit_code", 0);
 					itemName = dm.getString("item_name", 0);
 					storerCode = dm.getString("STORER_CODE", 0);
+				}else{
+					sql = "select STORER_CODE,item_code,unit_code,item_name from bas_item "
+							+ "where item_bar_code='"+itemBarCode+"'";
+					dm = DBOperator.DoSelect2DM(sql);
+					if (dm == null || dm.getCurrentCount() == 0) {
+						itemCode = itemBarCode;
+						unitCode = "007";
+						itemName = itemBarCode;
+					}else{
+						itemCode = dm.getString("item_code", 0);
+						unitCode = dm.getString("unit_code", 0);
+						itemName = dm.getString("item_name", 0);
+						storerCode = dm.getString("STORER_CODE", 0);
+					}
 				}
-			}else{
-				itemCode = dm.getString("item_code", 0);
-				unitCode = dm.getString("unit_code", 0);
-				itemName = dm.getString("item_name", 0);
 			}
+			
 			sql = "select STOCKTAKE_NO,STORER_CODE,WAREHOUSE_CODE,LOCATION_CODE,CONTAINER_CODE,ITEM_CODE "
 				+"from inv_stocktake_detail isd "
 				+" where isd.STOCKTAKE_NO='"+stockTakeNo+"' and isd.STORER_CODE='"+storerCode+"' "
