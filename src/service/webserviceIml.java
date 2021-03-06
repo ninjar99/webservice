@@ -1244,6 +1244,12 @@ public class webserviceIml {
 					}
 				}
 			}
+			sql = "update inb_receipt_detail set PUTAWAY_LOCATION_CODE='"+LOCATION_CODE+"',PUTAWAY_TIME=now() where INB_RECEIPT_DETAIL_ID in ("
+				+ "select INB_RECEIPT_DETAIL_ID from (select INB_RECEIPT_DETAIL_ID from inb_receipt_detail "
+				+ "where WAREHOUSE_CODE='"+WAREHOUSE_CODE+"' and CONTAINER_CODE='"+CONTAINER_CODE+"' "
+				+ "order by INB_RECEIPT_DETAIL_ID desc limit 1) t "
+				+ ")";
+			t = DBOperator.DoUpdate(sql);
 			return "OK-上架成功";//循环全部结束后，如果无异常，返回上架成功
 //			else{
 //				return "ERR-上架失败\n当前库位："+LOCATION_CODE+"，箱号："+CONTAINER_CODE+" \n之前有未完成的上架任务，请联系系统管理员";
